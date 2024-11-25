@@ -1,0 +1,24 @@
+---
+import { languages, getLangFromUrl, useTranslatedPath } from '../i18n/ui';
+
+const url = Astro.url;
+const currentLang = getLangFromUrl(url);
+const translatePath = useTranslatedPath(currentLang);
+
+// Remove the language prefix from the current path
+const currentPath = url.pathname.replace(/^\/[a-z]{2}\/|^\//, '/');
+---
+
+<select onchange="window.location.href=this.value"
+>
+  {
+    Object.entries(languages).map(([lang, label]) => {
+      const path = translatePath(currentPath, lang);
+      return (
+        <option value={path} selected={currentLang === lang}>
+          {label}
+        </option>
+      );
+    })
+  }
+</select>

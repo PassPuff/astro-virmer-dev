@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { languages, defaultLang } from '../i18n/ui';
+export const prerender = true
+
+export async function getStaticPaths() {
+  return Object.keys(languages).map((lang) => ({
+    params: { lang: lang === defaultLang ? undefined : lang },
+  }));
+}
+
+const { lang } = Astro.params;
+---
+<Layout title="Welcome">
+  <h1>Welcome to the homepage English</h1>
+</Layout>

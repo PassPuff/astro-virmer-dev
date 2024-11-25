@@ -1,0 +1,108 @@
+---
+import { getLangFromUrl, useTranslatedPath } from '../i18n/ui';
+import { getCategories } from '../lib/strapi';
+
+const url = Astro.url;
+const lang = getLangFromUrl(url);
+const translatePath = useTranslatedPath(lang);
+const categories = await getCategories(lang);
+
+const menuItems = [
+  { href: '/', label: 'Home' },
+  {
+    href: '/catalog',
+    label: 'Catalog',
+    submenu: categories.map(category => ({
+      href: `/catalog/${category.slug}`,
+      label: category.name
+    }))
+  },
+  { href: '/about', label: 'About Us' },
+  { href: '/service', label: 'Service' },
+];
+---
+
+<nav>
+  <div>
+    <div>
+      <div>
+        <div>
+          <a href={translatePath('/')}>LOGO</a>
+        </div>
+        <div>
+          {menuItems.map((item) => (
+            <div>
+              <a
+                href={translatePath(item.href)}
+              >
+                {item.label}
+              </a>
+              {item.submenu && (
+                <div>
+                  {item.submenu.map((subItem) => (
+                    <a
+                      href={translatePath(subItem.href)}
+                    >
+                      {subItem.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+ <!-- Mobile menu button -->
+      <!-- <div>
+        <button
+          type="button"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+        >
+          <span>Open main menu</span>
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div> -->
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <!-- <div id="mobile-menu">
+    <div>
+      {menuItems.map((item) => (
+        <div>
+          <a
+            href={translatePath(item.href)}
+          >
+            {item.label}
+          </a>
+          {item.submenu && (
+            <div>
+              {item.submenu.map((subItem) => (
+                <a
+                  href={translatePath(subItem.href)}
+                >
+                  {subItem.label}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div> -->
+
+</nav>
+
+<script>
+  const mobileMenuButton = document.querySelector('.mobile-menu-button');
+  const mobileMenu = document.querySelector('#mobile-menu');
+
+  if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  }
+</script>
