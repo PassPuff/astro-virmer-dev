@@ -3,6 +3,7 @@ import Layout from '../../../../../layouts/Layout.astro';
 import { languages, defaultLang, useTranslatedPath } from '../../../../../i18n/ui';
 import { getCategories, getProducts } from '../../../../../lib/strapi';
 export const prerender = true;
+
 export async function getStaticPaths() {
   const allPaths = await Promise.all(
     Object.keys(languages).map(async (lang) => {
@@ -10,7 +11,7 @@ export async function getStaticPaths() {
       const products = await getProducts(lang);
       return categories.flatMap((category) => {
         const categoryProducts = products.filter(
-          product => product.category?.data?.attributes?.slug === category.slug
+          product => product.category?.slug === category.slug
         );
         return categoryProducts.map((product) => ({
           params: {
@@ -32,73 +33,69 @@ export async function getStaticPaths() {
   return allPaths.flat();
 }
 
+
 const { product: productData, category, relatedProducts, lang: propLang } = Astro.props;
 const { lang = defaultLang } = Astro.params;
 const translatePath = useTranslatedPath(lang);
 
 ---
 <Layout title={productData.name}>
-  <main class="container mx-auto px-4 py-8">
-    <nav class="text-sm mb-6">
-      <a href={translatePath('catalog')} class="text-gray-400 hover:text-white">
+  <main>
+    <nav>
+      <a href={translatePath('catalog')}>
         Catalog
       </a>
-      <span class="mx-2 text-gray-600">/</span>
-      <a href={translatePath(`catalog/${category.slug}`)} class="text-gray-400 hover:text-white">
+      <span>/</span>
+      <a href={translatePath(`catalog/${category.slug}`)}>
         {category.name}
       </a>
-      <span class="mx-2 text-gray-600">/</span>
-      <span class="text-gray-200">{productData.name}</span>
+      <span>/</span>
+      <span>{productData.name}</span>
     </nav>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-      <div class="relative">
+    <div>
+      <div>
         {productData.imageMain && (
-          <img 
-            src={productData.imageMain.url}
+          <img
+            src={import.meta.env.STRAPI_URL+  productData.imageMain.url}
             alt={productData.name}
-            class="w-full rounded-lg shadow-lg"
           />
         )}
       </div>
-      
-      <div class="space-y-6">
-        <h1 class="text-4xl font-bold">{productData.name}</h1>
-        <p class="text-xl text-gray-300">{productData.description}</p>
-        
-        <div class="space-y-2">
-          <div class="flex items-center space-x-4">
-            <span class="text-3xl font-bold">${productData.orderPrice}</span>
+      <div>
+        <h1>{productData.name}</h1>
+        <p>{productData.description}</p>
+        <div>
+          <div>
+            <span>${productData.orderPrice}</span>
             {productData.newPrice && (
-              <span class="text-xl text-red-500 line-through">${productData.stockPrice}</span>
+              <span>${productData.stockPrice}</span>
             )}
           </div>
         </div>
       </div>
     </div>
 
-    {relatedProducts.length > 0 && (
-      <div class="mt-16">
-        <h2 class="text-2xl font-bold mb-6">Related Products</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- {relatedProducts.length > 0 && (
+      <div>
+        <h2>Related Products</h2>
+        <div>
           {relatedProducts.map((product) => (
-            <a 
+            <a
               href={translatePath(`catalog/${category.slug}/${product.slug}`)}
-              class="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >
               {product.imageMain && (
-                <img 
-                  src={product.imageMain.formats?.small?.url || product.imageMain.url}
+                <img
+                  src={import.meta.env.STRAPI_URL + product.imageMain.formats?.small?.url || product.imageMain.url}
                   alt={product.name}
-                  class="w-full h-48 object-cover"
                 />
               )}
-              <div class="p-4">
-                <h3 class="text-lg font-semibold mb-2 text-gray-800">{product.name}</h3>
-                <div class="flex justify-between items-center">
-                  <span class="text-lg font-bold text-gray-800">${product.orderPrice}</span>
+              <div>
+                <h3>{product.name}</h3>
+                <div>
+                  <span>${product.orderPrice}</span>
                   {product.newPrice && (
-                    <span class="text-red-500 line-through">${product.stockPrice}</span>
+                    <span>${product.stockPrice}</span>
                   )}
                 </div>
               </div>
@@ -106,7 +103,7 @@ const translatePath = useTranslatedPath(lang);
           ))}
         </div>
       </div>
-    )}
+    )} -->
   </main>
 </Layout> 
 
@@ -116,6 +113,5 @@ const translatePath = useTranslatedPath(lang);
     padding: 1rem;
     width: 100%;
     max-width: 1200px;
-    color: white;
   }
 </style>
